@@ -1,0 +1,1014 @@
+openapi: 3.0.0
+info:
+  description: This is a comprehensive API for the Node.js boilerplate
+  version: "1.0.0"
+  title: Node.js Boilerplate API
+  contact:
+    email: you@your-company.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/your-org/your-api/1.0.0
+tags:
+  - name: auth
+    description: Authentication operations
+  - name: users
+    description: User profile operations
+  - name: organizations
+    description: Organization management operations
+  - name: superadmin
+    description: Superadmin-only operations
+  - name: messages
+    description: Messaging operations
+  - name: payments
+    description: Payment operations
+  - name: activity_logs
+    description: Activity log operations
+  - name: settings
+    description: User settings operations
+  - name: waitlist
+    description: Waitlist operations
+  - name: random_data
+    description: Random data operations
+  - name: notifications
+    description: Notification operations
+  - name: blogs
+    description: Blog operations
+  - name: invites
+    description: Invite operations
+  - name: push_notifications
+    description: Push notification operations
+paths:
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Registers a new user
+      operationId: registerUser
+      requestBody:
+        description: User registration data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Invalid input
+
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Logs in a user
+      operationId: loginUser
+      requestBody:
+        description: User login data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        '401':
+          description: Unauthorized
+
+  /auth/magic-link:
+    post:
+      tags:
+        - auth
+      summary: Sends a magic link to the user's email for authentication
+      operationId: sendMagicLink
+      requestBody:
+        description: Email address to send the magic link to
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+      responses:
+        '200':
+          description: Magic link sent successfully
+        '400':
+          description: Invalid input
+
+  /auth/verify-magic-link:
+    post:
+      tags:
+        - auth
+      summary: Verifies the magic link token and logs in the user
+      operationId: verifyMagicLink
+      requestBody:
+        description: Magic link token
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkToken'
+      responses:
+        '200':
+          description: Magic link verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        '400':
+          description: Invalid token
+
+  /auth/change-password:
+    post:
+      tags:
+        - auth
+      summary: Changes the user's password
+      operationId: changePassword
+      requestBody:
+        description: Password change data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: Retrieves the authenticated user's profile
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+
+    put:
+      tags:
+        - users
+      summary: Updates the authenticated user's profile
+      operationId: updateUserProfile
+      requestBody:
+        description: User profile data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserProfile'
+      responses:
+        '200':
+          description: User profile updated successfully
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+
+  /organizations:
+    post:
+      tags:
+        - organizations
+      summary: Creates a new organization
+      operationId: createOrganization
+      requestBody:
+        description: Organization data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+      responses:
+        '201':
+          description: Organization created successfully
+        '400':
+          description: Invalid input
+
+    get:
+      tags:
+        - organizations
+      summary: Retrieves a list of organizations
+      operationId: getOrganizations
+      responses:
+        '200':
+          description: Organizations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organization'
+
+  /organizations/{id}:
+    get:
+      tags:
+        - organizations
+      summary: Retrieves details of a specific organization
+      operationId: getOrganizationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Organization details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '404':
+          description: Organization not found
+
+    put:
+      tags:
+        - organizations
+      summary: Updates an organization's details
+      operationId: updateOrganization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Organization data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganization'
+      responses:
+        '200':
+          description: Organization updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Organization not found
+
+    delete:
+      tags:
+        - organizations
+      summary: Deletes an organization
+      operationId: deleteOrganization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Organization deleted successfully
+        '404':
+          description: Organization not found
+
+  /superadmin/users:
+    get:
+      tags:
+        - superadmin
+      summary: Retrieves a list of all users
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /superadmin/users/{id}:
+    get:
+      tags:
+        - superadmin
+      summary: Retrieves details of a specific user
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+    put:
+      tags:
+        - superadmin
+      summary: Updates a user's details
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: User data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        '200':
+          description: User updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+
+    delete:
+      tags:
+        - superadmin
+      summary: Deletes a user
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User deleted successfully
+        '404':
+          description: User not found
+
+  /messages:
+    post:
+      tags:
+        - messages
+      summary: Sends a message
+      operationId: sendMessage
+      requestBody:
+        description: Message data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '201':
+          description: Message sent successfully
+        '400':
+          description: Invalid input
+
+  /payments:
+    post:
+      tags:
+        - payments
+      summary: Creates a new payment
+      operationId: createPayment
+      requestBody:
+        description: Payment data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '201':
+          description: Payment created successfully
+        '400':
+          description: Invalid input
+
+    get:
+      tags:
+        - payments
+      summary: Retrieves a list of payments
+      operationId: getPayments
+      responses:
+        '200':
+          description: Payments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+  /activity-logs:
+    get:
+      tags:
+        - activity_logs
+      summary: Retrieves a list of activity logs
+      operationId: getActivityLogs
+      responses:
+        '200':
+          description: Activity logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivityLog'
+
+  /settings:
+    get:
+      tags:
+        - settings
+      summary: Retrieves user settings
+      operationId: getUserSettings
+      responses:
+        '200':
+          description: Settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Setting'
+
+    put:
+      tags:
+        - settings
+      summary: Updates user settings
+      operationId: updateUserSettings
+      requestBody:
+        description: Settings data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setting'
+      responses:
+        '200':
+          description: Settings updated successfully
+        '400':
+          description: Invalid input
+
+  /waitlist:
+    post:
+      tags:
+        - waitlist
+      summary: Adds an email to the waitlist
+      operationId: addToWaitlist
+      requestBody:
+        description: Email data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+      responses:
+        '201':
+          description: Email added to waitlist successfully
+        '400':
+          description: Invalid input
+
+    get:
+      tags:
+        - waitlist
+      summary: Retrieves the waitlist
+      operationId: getWaitlist
+      responses:
+        '200':
+          description: Waitlist retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Waitlist'
+
+  /random-data:
+    post:
+      tags:
+        - random_data
+      summary: Adds random data
+      operationId: addRandomData
+      requestBody:
+        description: Random data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RandomData'
+      responses:
+        '201':
+          description: Random data added successfully
+        '400':
+          description: Invalid input
+
+    get:
+      tags:
+        - random_data
+      summary: Retrieves a list of random data
+      operationId: getRandomData
+      responses:
+        '200':
+          description: Random data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RandomData'
+
+  /notifications:
+    get:
+      tags:
+        - notifications
+      summary: Retrieves notifications for the user
+      operationId: getNotifications
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  /blogs:
+    post:
+      tags:
+        - blogs
+      summary: Creates a new blog post
+      operationId: createBlogPost
+      requestBody:
+        description: Blog post data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogPost'
+      responses:
+        '201':
+          description: Blog post created successfully
+        '400':
+          description: Invalid input
+
+    get:
+      tags:
+        - blogs
+      summary: Retrieves a list of blog posts
+      operationId: getBlogPosts
+      responses:
+        '200':
+          description: Blog posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlogPost'
+
+  /blogs/{id}:
+    get:
+      tags:
+        - blogs
+      summary: Retrieves a specific blog post by ID
+      operationId: getBlogPostById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Blog post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        '404':
+          description: Blog post not found
+
+    put:
+      tags:
+        - blogs
+      summary: Updates a blog post
+      operationId: updateBlogPost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Blog post data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogPost'
+      responses:
+        '200':
+          description: Blog post updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Blog post not found
+
+    delete:
+      tags:
+        - blogs
+      summary: Deletes a blog post
+      operationId: deleteBlogPost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Blog post deleted successfully
+        '404':
+          description: Blog post not found
+
+  /invites:
+    post:
+      tags:
+        - invites
+      summary: Sends an invite
+      operationId: sendInvite
+      requestBody:
+        description: Invite data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invite'
+      responses:
+        '201':
+          description: Invite sent successfully
+        '400':
+          description: Invalid input
+
+    get:
+      tags:
+        - invites
+      summary: Retrieves a list of invites
+      operationId: getInvites
+      responses:
+        '200':
+          description: Invites retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invite'
+
+  /invites/{token}/accept:
+    post:
+      tags:
+        - invites
+      summary: Accepts an invite
+      operationId: acceptInvite
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invite accepted successfully
+        '400':
+          description: Invalid token
+
+  /invites/{token}/decline:
+    post:
+      tags:
+        - invites
+      summary: Declines an invite
+      operationId: declineInvite
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invite declined successfully
+        '400':
+          description: Invalid token
+
+  /push-notifications:
+    post:
+      tags:
+        - push_notifications
+      summary: Sends a push notification
+      operationId: sendPushNotification
+      requestBody:
+        description: Push notification data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushNotification'
+      responses:
+        '201':
+          description: Push notification sent successfully
+        '400':
+          description: Invalid input
+
+    get:
+      tags:
+        - push_notifications
+      summary: Retrieves a list of push notifications
+      operationId: getPushNotifications
+      responses:
+        '200':
+          description: Push notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PushNotification'
+
+components:
+  schemas:
+    RegisterUser:
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        name:
+          type: string
+
+    LoginUser:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+
+    Email:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+
+    MagicLinkToken:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+
+    ChangePassword:
+      type: object
+      required:
+        - currentPassword
+        - newPassword
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    UpdateUserProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    UpdateOrganization:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        senderId:
+          type: string
+          format: uuid
+        receiverId:
+          type: string
+          format: uuid
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: float
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ActivityLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        action:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Setting:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    Waitlist:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+
+    RandomData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        data:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    BlogPost:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+        authorId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+
+    Invite:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        token:
+          type: string
+
+    PushNotification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
